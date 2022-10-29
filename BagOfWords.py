@@ -15,18 +15,22 @@ técnica bag of Words em todo o corpus.
 from bs4 import BeautifulSoup
 import requests
 import spacy
+import numpy as np
+import pandas as pd
+import nltk
+import re
 
 nlp = spacy.load("en_core_web_sm")
+
 
 def adiciona_site(site, lsentencas):
     html = requests.get(site)
     soap = BeautifulSoup(html.content, 'html.parser')
+    text=soap.get_text()
+    token=re.findall('\w+', text)
 
-    for doc in soap.find_all('p'):
-        documento = nlp(doc.text)
-        for sentenca in documento:
-            lsentencas.append(sentenca)
-    return lsentencas
+    for word in token:
+      lsentencas.append(word.lower())
 
 lsentencas = []
 sentencas1 = adiciona_site("https://en.wikipedia.org/wiki/Natural_language_processing", lsentencas)
@@ -35,4 +39,11 @@ sentencas3 = adiciona_site("https://www.sas.com/en_us/insights/analytics/what-is
 sentencas4 = adiciona_site("https://builtin.com/data-science/high-level-guide-natural-language-processing-techniques", lsentencas)
 sentencas5 = adiciona_site("https://deepsense.ai/a-business-guide-to-natural-language-processing-nlp/", lsentencas)
 
-print(lsentencas)
+bow=pd.DataFrame(0, index=np.arange(len(lsentencas)), columns=lsentencas)
+
+count=0
+for i in lsentencas:
+  bow.at[count,i]+=1
+  count+=1
+
+bow
