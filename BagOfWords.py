@@ -28,8 +28,8 @@ def adiciona_site(site, lsentencas):
     text=soap.get_text()
     token=re.findall('\w+', text)
 
-    for word in token:
-      lsentencas.append(word.lower())
+    for palavra in token:
+      lsentencas.append(palavra.lower())
     return lsentencas
 
 lsentencas = []
@@ -52,4 +52,4 @@ def bowsum(bow):
 
 
 newbow = bowsum(bow)
-newbow
+newbow[40:]
