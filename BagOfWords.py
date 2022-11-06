@@ -52,4 +52,4 @@ def bowsum(bow):
 
 
 newbow = bowsum(bow)
-newbow[40:]
+newbow[:1000]
