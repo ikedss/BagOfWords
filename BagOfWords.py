@@ -1,15 +1,9 @@
 # Aluno: Leonardo Ikeda
 
 """
-Sua tarefa será  gerar a matriz termo documento, dos documentos recuperados da internet e
-imprimir esta matriz na tela. Para tanto:
-a) Considere que todas as listas de sentenças devem ser transformadas em listas de vetores,
-onde cada item será uma das palavras da sentença.
-b) Todos  os  vetores  devem  ser  unidos  em  um  corpus  único  formando  uma  lista  de  vetores,
-onde cada item será um lexema.
-c) Este único corpus será usado para gerar o vocabulário.
-d) O  resultado  esperado  será  uma  matriz  termo  documento  criada  a  partir  da  aplicação  da
-técnica bag of Words em todo o corpus.
+Sua  tarefa  será  gerar  a  matriz  termo-documento  usando  TF-IDF  por  meio  da  aplicação  das
+fórmulas TF-IDF na matriz termo-documento criada com a utilização do algoritmo Bag of Words. Sobre
+o Corpus que recuperamos anteriormente.
 """
 
 from bs4 import BeautifulSoup
@@ -27,11 +21,25 @@ def adiciona_site(site, lsentencas):
     soap = BeautifulSoup(html.content, 'html.parser')
     text = soap.get_text()
     token = re.findall('\w+', text)
-    # O Colab não consegue rodar com todas as palavras, então tive que limitar a lista
-    for palavra in token[:1000]:
-      lsentencas.append(palavra.lower())
-    return lsentencas
 
+    for palavra in token:
+      ltok.append(palavra)
+
+    sents = []
+
+    sentenca_atual = ""
+    for letra in text:
+      if letra == "." or letra == "," or letra == "?" or letra == "!" or letra == ";" or letra == "\n" or letra == "\t" or letra == "\t":
+          if not sentenca_atual.isspace() and len(sentenca_atual) > 0:
+              sents.append(sentenca_atual)
+              sentenca_atual = ""
+          else:
+              sentenca_atual = ""
+      else:
+          sentenca_atual += letra
+    lsentencas.append(sents)
+
+ltok = []
 lsentencas = []
 sentencas1 = adiciona_site("https://en.wikipedia.org/wiki/Natural_language_processing", lsentencas)
 sentencas2 = adiciona_site("https://www.ibm.com/cloud/learn/natural-language-processing", lsentencas)
@@ -39,17 +47,16 @@ sentencas3 = adiciona_site("https://www.sas.com/en_us/insights/analytics/what-is
 sentencas4 = adiciona_site("https://builtin.com/data-science/high-level-guide-natural-language-processing-techniques", lsentencas)
 sentencas5 = adiciona_site("https://deepsense.ai/a-business-guide-to-natural-language-processing-nlp/", lsentencas)
 
+index = []
+for i in lsentencas:
+  for j in i:
+    index.append(j)
 
-bow = pd.DataFrame(0, index=np.arange(len(lsentencas)), columns=lsentencas)
+bow = pd.DataFrame(0, index=index, columns=ltok)
 
+for i in index[:300]:
+  for j in ltok[:300]:
+    if j in i:
+      bow.loc[i,j] += 1
 
-def bowsum(bow):
-    count = 0
-    for i in lsentencas:
-        bow.at[count, i] += 1
-        count += 1
-    return bow
-
-
-newbow = bowsum(bow)
-newbow
+bow
